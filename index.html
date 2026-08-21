@@ -675,14 +675,21 @@
     musicOn ? pauseMusic() : playMusic();
   });
 
-  // personalized greeting from ?dear= query param
+  // personalized greeting from ?dear= query param — only allow known guest names
+  const ALLOWED_DEAR_NAMES = [
+    'Aida', 'Aysel', 'Nazmia', 'Sevda', 'Gülgəz', 'Kamran', 'Pialə', 'Fəridə',
+    'Türkan', 'Nurcan', 'Aysun', 'Günay', 'Gülşən', 'Aişə', 'Zeynəb', 'Əsma',
+    'Bəsdi', 'Lalə', 'Səma', 'İlahə', 'Rəvanə'
+  ];
   const dearNameRaw = new URLSearchParams(window.location.search).get('dear');
   if (dearNameRaw && dearNameRaw.trim()){
-    const trimmed = dearNameRaw.trim();
-    const dearName = trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
-    const greeting = document.getElementById('dearGreeting');
-    greeting.textContent = `Əzizim ${dearName},`;
-    greeting.hidden = false;
+    const trimmed = dearNameRaw.trim().toLocaleLowerCase('az');
+    const dearName = ALLOWED_DEAR_NAMES.find(name => name.toLocaleLowerCase('az') === trimmed);
+    if (dearName){
+      const greeting = document.getElementById('dearGreeting');
+      greeting.textContent = `Əzizim ${dearName},`;
+      greeting.hidden = false;
+    }
   }
 
   // single-screen step player: cross-fades through each step in place,
