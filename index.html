@@ -471,11 +471,19 @@
   }
 
   function playMusic(){
-    ytCommand('unMute');
-    ytCommand('playVideo');
     musicOn = true;
     musicToggle.textContent = '🔊';
     musicToggle.setAttribute('aria-label', 'Musiqini bağla');
+    // the YouTube player may not be ready the instant this fires, so
+    // resend the commands a few times over the following seconds
+    let attempts = 0;
+    const retry = setInterval(() => {
+      ytCommand('unMute');
+      ytCommand('setVolume', [100]);
+      ytCommand('playVideo');
+      attempts++;
+      if (attempts >= 6) clearInterval(retry);
+    }, 400);
   }
 
   function pauseMusic(){
