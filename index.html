@@ -605,13 +605,7 @@
 
 <canvas id="ambient"></canvas>
 
-<iframe
-  id="bgMusic"
-  title="Fon musiqisi"
-  style="position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none;"
-  src="https://www.youtube-nocookie.com/embed/SXfF8vb2B24?autoplay=0&mute=1&loop=1&playlist=SXfF8vb2B24&controls=0&enablejsapi=1&playsinline=1"
-  allow="autoplay; encrypted-media"
-></iframe>
+<audio id="bgMusic" src="/assets/song.mp3" loop preload="auto"></audio>
 
 <button id="musicToggle" class="music-toggle" type="button" aria-label="Musiqini aç">🔇</button>
 
@@ -747,7 +741,6 @@
   const I18N = {
     az: {
       pageTitle: 'Asər & Türkan — Toy Dəvətnaməsi',
-      bgMusicTitle: 'Fon musiqisi',
       ariaMusicPlay: 'Musiqini aç',
       ariaMusicPause: 'Musiqini bağla',
       ariaPrev: 'Əvvəlki',
@@ -773,7 +766,6 @@
     },
     ka: {
       pageTitle: 'ასერ & თურქან — ქორწილის მოსაწვევი',
-      bgMusicTitle: 'ფონური მუსიკა',
       ariaMusicPlay: 'მუსიკის ჩართვა',
       ariaMusicPause: 'მუსიკის გამორთვა',
       ariaPrev: 'წინა',
@@ -805,10 +797,9 @@
     el.textContent = t[el.dataset.i18n];
   });
 
-  // background music: autoplays muted on load (browsers block audible
-  // autoplay without a user gesture), unmutes on the first tap/click
+  // background music: starts playing once the guest taps the start gate
+  // (browsers block audible autoplay without a user gesture)
   const bgMusic = document.getElementById('bgMusic');
-  bgMusic.setAttribute('title', t.bgMusicTitle);
   const musicToggle = document.getElementById('musicToggle');
   musicToggle.setAttribute('aria-label', t.ariaMusicPlay);
   document.getElementById('prevStep').setAttribute('aria-label', t.ariaPrev);
@@ -837,28 +828,15 @@
     } catch (err) { /* clipboard unavailable — nothing more we can do */ }
   });
 
-  function ytCommand(func, args = []){
-    bgMusic.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
-  }
-
   function playMusic(){
     musicOn = true;
     musicToggle.textContent = '🔊';
     musicToggle.setAttribute('aria-label', t.ariaMusicPause);
-    // the YouTube player may not be ready the instant this fires, so
-    // resend the commands a few times over the following seconds
-    let attempts = 0;
-    const retry = setInterval(() => {
-      ytCommand('unMute');
-      ytCommand('setVolume', [100]);
-      ytCommand('playVideo');
-      attempts++;
-      if (attempts >= 6) clearInterval(retry);
-    }, 400);
+    bgMusic.play().catch(() => { /* blocked without a user gesture — ignored */ });
   }
 
   function pauseMusic(){
-    ytCommand('mute');
+    bgMusic.pause();
     musicOn = false;
     musicToggle.textContent = '🔇';
     musicToggle.setAttribute('aria-label', t.ariaMusicPlay);
