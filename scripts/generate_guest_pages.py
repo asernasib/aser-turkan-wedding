@@ -4,8 +4,11 @@
 Reads the guest list straight out of index.html's ALLOWED_DEAR_NAMES array (so
 there is one source of truth), slugifies each name with the same rules as the
 site's client-side slugifyGuestName(), and writes /i/<slug>.html — a page whose
-og:/twitter: meta tags read "Dəvətli: <Name>" for link-preview crawlers, which
-immediately redirects a real visitor into the main experience via ?dear=<Name>.
+og:/twitter: meta tags read "Dəvətli: <Name>" for link-preview crawlers, and
+redirects a real visitor into the main experience via ?dear=<Name> — via a JS
+location.replace() only, deliberately NOT a <meta http-equiv="refresh"> (many
+crawlers, including Facebook's, follow an instant 0-second meta-refresh like a
+real redirect and read the *target* page's tags instead of this page's own).
 
 Run manually after editing the guest list in index.html:
     python3 scripts/generate_guest_pages.py
@@ -68,7 +71,6 @@ PAGE_TEMPLATE = """<!doctype html>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="shortcut icon" href="/favicon.ico">
-<meta http-equiv="refresh" content="0; url={redirect_url}">
 <style>
   :root{{ color-scheme:dark; }}
   body{{
