@@ -448,11 +448,19 @@
     padding:0.6rem 1.3rem;
     border:1px solid var(--hair);
     border-radius:999px;
+    background:rgba(28,20,40,0.4);
+    font-family:inherit;
     font-size:0.68rem;
     letter-spacing:0.24em;
     text-transform:uppercase;
     color:var(--parchment-dim);
+    cursor:pointer;
     animation:ctaBreathe 2.4s ease-in-out infinite;
+  }
+  .start-gate-cta:hover, .start-gate-cta:focus-visible{
+    border-color:var(--gold);
+    color:var(--parchment);
+    outline:none;
   }
   .start-gate-cta svg{
     width:14px;
@@ -493,10 +501,10 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="5.5" width="19" height="13" rx="1.5"/><path d="M3 7l9 6 9-6"/></svg>
   </div>
   <p class="start-gate-headline">Sizin məktubunuz var!</p>
-  <span class="start-gate-cta">
+  <button id="startGateCta" class="start-gate-cta" type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 3v10a3 3 0 0 0 6 0V7"/><path d="M9 8V6a3 3 0 0 1 6 0v1"/><path d="M15 11l1.5-1a2 2 0 0 1 3 1.7v3.3a5 5 0 0 1-5 5h-2a5 5 0 0 1-4.2-2.3L6 14"/></svg>
     Açmaq üçün toxunun
-  </span>
+  </button>
 </div>
 
 <div class="stage">
@@ -649,6 +657,11 @@
     }
   }
 
+  const startGateCta = document.getElementById('startGateCta');
+  startGateCta.addEventListener('click', (e) => {
+    e.stopPropagation();
+    startExperience();
+  });
   startGate.addEventListener('click', startExperience);
   startGate.addEventListener('touchstart', startExperience, { passive: true });
   document.addEventListener('keydown', startExperience, { once: true });
