@@ -985,8 +985,10 @@
     e.stopPropagation();
     startExperience();
   });
+  // 'click' only — touchstart isn't reliably treated as a valid user
+  // gesture for unlocking audio playback on iOS Safari, so triggering
+  // startExperience() from it can leave bgMusic.play() silently blocked
   startGate.addEventListener('click', startExperience);
-  startGate.addEventListener('touchstart', startExperience, { passive: true });
   document.addEventListener('keydown', startExperience, { once: true });
 
   // ambient fireflies + twinkling stars canvas
