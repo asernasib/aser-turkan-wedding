@@ -40,7 +40,11 @@ SANS_FONT = "/usr/share/fonts/julietaula-montserrat-fonts/Montserrat-Regular.otf
 SANS_SB_FONT = "/usr/share/fonts/julietaula-montserrat-fonts/Montserrat-SemiBold.otf"
 
 # must mirror GUEST_SLUG_OVERRIDES / GUEST_SLUG_MAP in index.html's <script>
-SLUG_OVERRIDES = {"თიკა": "tika"}
+SLUG_OVERRIDES = {
+    "თიკა": "tika", "ნინო": "nino", "მარი": "mari", "თეო": "teo", "მაია": "maia",
+    "ნათია": "natia", "მაკა": "maka", "ანი": "ani", "ნონა": "nona", "ნაზი": "nazi",
+    "გიორგი": "giorgi",
+}
 SLUG_MAP = {"ə": "e", "ı": "i", "ö": "o", "ü": "u", "ş": "s", "ç": "c", "ğ": "g"}
 
 

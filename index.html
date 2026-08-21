@@ -854,11 +854,16 @@
     'Bəsdi', 'Lalə', 'Səma', 'İlahə', 'Rəvanə', 'Lamiyə', 'Mədinə', 'Leyla',
     'Nailə', 'Nəzrin', 'Röyalə', 'Sali', 'Laləzar', 'Solmaz', 'Maia', 'Sevinc',
     'Ləman', 'Tika', 'თიკა', 'Nino', 'Mari', 'Teo', 'Natia', 'Maka', 'Ani',
-    'Nona', 'Nazi', 'Giorgi', 'Arzu', 'Günel'
+    'Nona', 'Nazi', 'Giorgi', 'Arzu', 'Günel',
+    'ნინო', 'მარი', 'თეო', 'მაია', 'ნათია', 'მაკა', 'ანი', 'ნონა', 'ნაზი', 'გიორგი'
   ];
   // matches the slug scheme used by scripts/generate_guest_pages.py to name
   // the per-guest static pages in /i/ — keep both in sync if this changes
-  const GUEST_SLUG_OVERRIDES = { 'თიკა': 'tika' };
+  const GUEST_SLUG_OVERRIDES = {
+    'თიკა': 'tika', 'ნინო': 'nino', 'მარი': 'mari', 'თეო': 'teo', 'მაია': 'maia',
+    'ნათია': 'natia', 'მაკა': 'maka', 'ანი': 'ani', 'ნონა': 'nona', 'ნაზი': 'nazi',
+    'გიორგი': 'giorgi'
+  };
   const GUEST_SLUG_MAP = { 'ə': 'e', 'ı': 'i', 'ö': 'o', 'ü': 'u', 'ş': 's', 'ç': 'c', 'ğ': 'g' };
   function slugifyGuestName(name){
     if (GUEST_SLUG_OVERRIDES[name]) return GUEST_SLUG_OVERRIDES[name];
