@@ -564,10 +564,10 @@
   <div class="start-gate-ring">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="5.5" width="19" height="13" rx="1.5"/><path d="M3 7l9 6 9-6"/></svg>
   </div>
-  <p class="start-gate-headline">Sizin məktubunuz var!</p>
+  <p class="start-gate-headline" data-i18n="startGateHeadline">Sizin məktubunuz var!</p>
   <button id="startGateCta" class="start-gate-cta" type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 3v10a3 3 0 0 0 6 0V7"/><path d="M9 8V6a3 3 0 0 1 6 0v1"/><path d="M15 11l1.5-1a2 2 0 0 1 3 1.7v3.3a5 5 0 0 1-5 5h-2a5 5 0 0 1-4.2-2.3L6 14"/></svg>
-    Açmaq üçün toxunun
+    <span data-i18n="startGateCta">Açmaq üçün toxunun</span>
   </button>
 </div>
 
@@ -583,7 +583,7 @@
     <div class="envelope-wrap">
       <div class="envelope-body"></div>
       <div class="letter-card">
-        <p class="letter-eyebrow">Toy dəvətnaməsi</p>
+        <p class="letter-eyebrow" data-i18n="letterEyebrow">Toy dəvətnaməsi</p>
         <p class="letter-names">Asər <span class="amp">&amp;</span> Türkan</p>
       </div>
       <div class="envelope-flap"></div>
@@ -597,31 +597,31 @@
     </div>
     <div class="invite-text">
       <p id="dearGreeting" class="dear-greeting" hidden></p>
-      <p>Həyatımızın ən gözəl günündə sizi də yanımızda görmək istəyirik. <span class="accent">❤️</span></p>
-      <p>Toyumuza dəvətlisiniz! Bu xoşbəxt günümüzü sizinlə birlikdə qeyd etməkdən böyük məmnuniyyət duyarıq. <span class="accent">🤵🏻👰🏻‍♀️</span></p>
+      <p><span data-i18n="inviteText1">Həyatımızın ən gözəl günündə sizi də yanımızda görmək istəyirik.</span> <span class="accent">❤️</span></p>
+      <p><span data-i18n="inviteText2">Toyumuza dəvətlisiniz! Bu xoşbəxt günümüzü sizinlə birlikdə qeyd etməkdən böyük məmnuniyyət duyarıq.</span> <span class="accent">🤵🏻👰🏻‍♀️</span></p>
     </div>
   </div>
 
   <div class="step" data-step="2">
     <div class="plate">
-      <p class="plate-title">Toy günü</p>
+      <p class="plate-title" data-i18n="plateTitle">Toy günü</p>
       <div class="detail-grid">
 
         <div class="detail-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="15.5" cy="15" r="2.3" fill="currentColor" stroke="none"/></svg>
-          <span class="detail-label">Tarix</span>
-          <span class="detail-value">29 Avqust</span>
+          <span class="detail-label" data-i18n="labelDate">Tarix</span>
+          <span class="detail-value" data-i18n="valueDate">29 Avqust</span>
         </div>
 
         <div class="detail-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-          <span class="detail-label">Saat</span>
+          <span class="detail-label" data-i18n="labelTime">Saat</span>
           <span class="detail-value">18:00</span>
         </div>
 
         <div class="detail-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
-          <span class="detail-label">Məkan</span>
+          <span class="detail-label" data-i18n="labelPlace">Məkan</span>
           <span class="detail-value">Bolnisi</span>
           <span class="detail-sub">Dzveli Kveshi</span>
         </div>
@@ -633,15 +633,72 @@
   <div class="step" data-step="3">
     <div class="closing-heart">❤</div>
     <p class="closing-names">Asər &amp; Türkan</p>
-    <p class="closing-note">Sizi gözləyirik</p>
+    <p class="closing-note" data-i18n="closingNote">Sizi gözləyirik</p>
   </div>
 </div>
 
 <script>
+  // language: ?l=ka shows the Georgian translation, everything else stays Azerbaijani
+  const LANG = new URLSearchParams(window.location.search).get('l') === 'ka' ? 'ka' : 'az';
+  document.documentElement.lang = LANG;
+
+  const I18N = {
+    az: {
+      pageTitle: 'Asər & Türkan — Toy Dəvətnaməsi',
+      bgMusicTitle: 'Fon musiqisi',
+      ariaMusicPlay: 'Musiqini aç',
+      ariaMusicPause: 'Musiqini bağla',
+      ariaPrev: 'Əvvəlki',
+      ariaNext: 'Növbəti',
+      startGateHeadline: 'Sizin məktubunuz var!',
+      startGateCta: 'Açmaq üçün toxunun',
+      letterEyebrow: 'Toy dəvətnaməsi',
+      inviteText1: 'Həyatımızın ən gözəl günündə sizi də yanımızda görmək istəyirik.',
+      inviteText2: 'Toyumuza dəvətlisiniz! Bu xoşbəxt günümüzü sizinlə birlikdə qeyd etməkdən böyük məmnuniyyət duyarıq.',
+      plateTitle: 'Toy günü',
+      labelDate: 'Tarix',
+      valueDate: '29 Avqust',
+      labelTime: 'Saat',
+      labelPlace: 'Məkan',
+      closingNote: 'Sizi gözləyirik',
+      dearPrefix: 'Əzizim'
+    },
+    ka: {
+      pageTitle: 'Asər & Türkan — ქორწილის მოსაწვევი',
+      bgMusicTitle: 'ფონური მუსიკა',
+      ariaMusicPlay: 'მუსიკის ჩართვა',
+      ariaMusicPause: 'მუსიკის გამორთვა',
+      ariaPrev: 'წინა',
+      ariaNext: 'შემდეგი',
+      startGateHeadline: 'თქვენ გაქვთ წერილი!',
+      startGateCta: 'გასახსნელად შეეხეთ',
+      letterEyebrow: 'ქორწილის მოსაწვევი',
+      inviteText1: 'გვინდა, რომ ჩვენი ცხოვრების ულამაზეს დღეს თქვენც ჩვენთან ერთად იყოთ.',
+      inviteText2: 'გიწვევთ ჩვენს ქორწილში! დიდი სიამოვნებით აღვნიშნავთ ამ ბედნიერ დღეს თქვენთან ერთად.',
+      plateTitle: 'ქორწილის დღე',
+      labelDate: 'თარიღი',
+      valueDate: '29 აგვისტო',
+      labelTime: 'საათი',
+      labelPlace: 'ადგილი',
+      closingNote: 'გელოდებით',
+      dearPrefix: 'ძვირფასო'
+    }
+  };
+  const t = I18N[LANG];
+
+  document.title = t.pageTitle;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t[el.dataset.i18n];
+  });
+
   // background music: autoplays muted on load (browsers block audible
   // autoplay without a user gesture), unmutes on the first tap/click
   const bgMusic = document.getElementById('bgMusic');
+  bgMusic.setAttribute('title', t.bgMusicTitle);
   const musicToggle = document.getElementById('musicToggle');
+  musicToggle.setAttribute('aria-label', t.ariaMusicPlay);
+  document.getElementById('prevStep').setAttribute('aria-label', t.ariaPrev);
+  document.getElementById('nextStep').setAttribute('aria-label', t.ariaNext);
   let musicOn = false;
 
   function ytCommand(func, args = []){
@@ -651,7 +708,7 @@
   function playMusic(){
     musicOn = true;
     musicToggle.textContent = '🔊';
-    musicToggle.setAttribute('aria-label', 'Musiqini bağla');
+    musicToggle.setAttribute('aria-label', t.ariaMusicPause);
     // the YouTube player may not be ready the instant this fires, so
     // resend the commands a few times over the following seconds
     let attempts = 0;
@@ -668,7 +725,7 @@
     ytCommand('mute');
     musicOn = false;
     musicToggle.textContent = '🔇';
-    musicToggle.setAttribute('aria-label', 'Musiqini aç');
+    musicToggle.setAttribute('aria-label', t.ariaMusicPlay);
   }
 
   musicToggle.addEventListener('click', (e) => {
@@ -688,7 +745,7 @@
     const dearName = ALLOWED_DEAR_NAMES.find(name => name.toLocaleLowerCase('az') === trimmed);
     if (dearName){
       const greeting = document.getElementById('dearGreeting');
-      greeting.textContent = `Əzizim ${dearName},`;
+      greeting.textContent = `${t.dearPrefix} ${dearName},`;
       greeting.hidden = false;
     }
   }
