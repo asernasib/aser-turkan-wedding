@@ -385,6 +385,13 @@
   .summary-names{
     margin:0 0 clamp(0.8rem, 2.4vh, 1.4rem);
   }
+  .summary-guest{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:clamp(0.85rem, 2.4vh, 1.1rem);
+    color:var(--parchment-dim);
+    margin:-0.6rem 0 clamp(0.8rem, 2.4vh, 1.4rem);
+  }
   .closing-note{
     font-size:0.78rem;
     letter-spacing:0.06em;
@@ -656,6 +663,7 @@
     <div class="plate">
       <p class="letter-eyebrow" data-i18n="summaryEyebrow">Toy günü təfərrüatları</p>
       <p class="closing-names summary-names"><span data-i18n="groomName">Asər</span> &amp; <span data-i18n="brideName">Türkan</span></p>
+      <p id="summaryGuest" class="summary-guest" hidden></p>
       <div class="detail-grid">
 
         <div class="detail-item">
@@ -709,7 +717,8 @@
       dearPrefix: 'Əzizim',
       groomName: 'Asər',
       brideName: 'Türkan',
-      summaryEyebrow: 'Toy günü təfərrüatları'
+      summaryEyebrow: 'Toy günü təfərrüatları',
+      guestLabel: 'Dəvətli'
     },
     ka: {
       pageTitle: 'ასერ & თურქან — ქორწილის მოსაწვევი',
@@ -732,7 +741,8 @@
       dearPrefix: 'ძვირფასო',
       groomName: 'ასერ',
       brideName: 'თურქან',
-      summaryEyebrow: 'ქორწილის დღის დეტალები'
+      summaryEyebrow: 'ქორწილის დღის დეტალები',
+      guestLabel: 'მოწვეული'
     }
   };
   const t = I18N[LANG];
@@ -800,6 +810,10 @@
       const greeting = document.getElementById('dearGreeting');
       greeting.textContent = `${t.dearPrefix} ${dearName},`;
       greeting.hidden = false;
+
+      const summaryGuest = document.getElementById('summaryGuest');
+      summaryGuest.textContent = `${t.guestLabel}: ${dearName}`;
+      summaryGuest.hidden = false;
     }
   }
 
