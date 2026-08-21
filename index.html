@@ -674,10 +674,12 @@
   });
 
   // personalized greeting from ?dear= query param
-  const dearName = new URLSearchParams(window.location.search).get('dear');
-  if (dearName && dearName.trim()){
+  const dearNameRaw = new URLSearchParams(window.location.search).get('dear');
+  if (dearNameRaw && dearNameRaw.trim()){
+    const trimmed = dearNameRaw.trim();
+    const dearName = trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
     const greeting = document.getElementById('dearGreeting');
-    greeting.textContent = `Əzizim ${dearName.trim()},`;
+    greeting.textContent = `Əzizim ${dearName},`;
     greeting.hidden = false;
   }
 
