@@ -121,7 +121,9 @@
     backface-visibility:hidden;
     -webkit-backface-visibility:hidden;
     animation:flapOpen 1.3s 0.7s cubic-bezier(.6,.1,.3,1) forwards;
+    animation-play-state:paused;
   }
+  .stage.playing .envelope-flap{ animation-play-state:running; }
   @keyframes flapOpen{ to{ transform:rotateX(178deg); } }
 
   .seal{
@@ -143,7 +145,9 @@
     font-size:clamp(0.8rem, 3.4vh, 1.2rem);
     color:#3a2410;
     animation:sealBreak 0.6s 1.1s ease-in forwards;
+    animation-play-state:paused;
   }
+  .stage.playing .seal{ animation-play-state:running; }
   @keyframes sealBreak{ to{ transform:scale(0); opacity:0; } }
 
   .letter-card{
@@ -161,7 +165,9 @@
     z-index:4;
     opacity:0;
     animation:letterRise 1.1s 1.5s cubic-bezier(.2,.7,.3,1) forwards;
+    animation-play-state:paused;
   }
+  .stage.playing .letter-card{ animation-play-state:running; }
   @keyframes letterRise{
     0%{ opacity:0; transform:translate(-50%, 30%); }
     100%{ opacity:1; transform:translate(-50%, -46%); }
@@ -211,7 +217,9 @@
     transform-origin:left center;
     transform:scaleX(0);
     animation:playThrough 15.6s linear infinite;
+    animation-play-state:paused;
   }
+  .stage.playing .progress-rail::after{ animation-play-state:running; }
   @keyframes playThrough{ to{ transform:scaleX(1); } }
 
   /* ---------- divider ---------- */
@@ -361,12 +369,70 @@
     align-items:center;
     justify-content:center;
     cursor:pointer;
-    transition:transform 0.3s ease, border-color 0.3s ease;
+    opacity:0;
+    pointer-events:none;
+    transition:transform 0.3s ease, border-color 0.3s ease, opacity 0.6s ease;
+  }
+  .music-toggle.visible{
+    opacity:1;
+    pointer-events:auto;
   }
   .music-toggle:hover, .music-toggle:focus-visible{
     transform:scale(1.08);
     border-color:var(--gold);
     outline:none;
+  }
+
+  /* ---------- tap-to-start gate ---------- */
+  .start-gate{
+    position:fixed;
+    inset:0;
+    z-index:40;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:0.9rem;
+    text-align:center;
+    padding:2rem;
+    background:rgba(12,8,20,0.72);
+    backdrop-filter:blur(3px);
+    cursor:pointer;
+    transition:opacity 0.7s ease;
+  }
+  .start-gate.hidden{
+    opacity:0;
+    pointer-events:none;
+  }
+  .start-gate-ring{
+    width:3.4rem;
+    height:3.4rem;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.3rem;
+    color:var(--gold-bright);
+    animation:ringPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes ringPulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(211,164,87,0.35); }
+    50%{ box-shadow:0 0 0 10px rgba(211,164,87,0); }
+  }
+  .start-gate-title{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:clamp(1.2rem, 4.4vh, 1.7rem);
+    color:var(--gold-bright);
+    margin:0;
+  }
+  .start-gate-sub{
+    font-size:0.78rem;
+    letter-spacing:0.05em;
+    color:var(--parchment-dim);
+    margin:0;
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -376,6 +442,7 @@
     .closing-heart{ animation:none; }
     .progress-rail::after{ animation:none; transform:scaleX(1); }
     .step{ transition:opacity 0.4s ease; transform:none !important; }
+    .start-gate-ring{ animation:none; }
   }
 </style>
 
@@ -390,6 +457,12 @@
 ></iframe>
 
 <button id="musicToggle" class="music-toggle" type="button" aria-label="Musiqini aç">🔇</button>
+
+<div id="startGate" class="start-gate" role="button" tabindex="0">
+  <div class="start-gate-ring">💌</div>
+  <p class="start-gate-title">Toxunun</p>
+  <p class="start-gate-sub">Səs və dəvətnamə açılacaq</p>
+</div>
 
 <div class="stage">
   <svg class="stage-vines" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -493,13 +566,6 @@
     musicToggle.setAttribute('aria-label', 'Musiqini aç');
   }
 
-  ['click', 'touchstart', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, function firstInteract(){
-      playMusic();
-      ['click', 'touchstart', 'keydown'].forEach(e => document.removeEventListener(e, firstInteract));
-    }, { once: true });
-  });
-
   musicToggle.addEventListener('click', (e) => {
     e.stopPropagation();
     musicOn ? pauseMusic() : playMusic();
@@ -514,22 +580,43 @@
   }
 
   // single-screen step player: cross-fades through each step in place,
-  // looping continuously, with no scrolling or interaction required
+  // looping continuously
+  const stage = document.querySelector('.stage');
   const steps = Array.from(document.querySelectorAll('.step'));
   const holdMs = 3900;
   let current = 0;
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (prefersReducedMotion){
-    steps.forEach(s => s.classList.add('active'));
-  } else {
-    setInterval(() => {
-      steps[current].classList.remove('active');
-      current = (current + 1) % steps.length;
-      steps[current].classList.add('active');
-    }, holdMs);
+  // everything - sound and the envelope/step animations - stays frozen
+  // until the guest taps or presses a key on the start gate
+  const startGate = document.getElementById('startGate');
+  let started = false;
+
+  function startExperience(){
+    if (started) return;
+    started = true;
+
+    startGate.classList.add('hidden');
+    setTimeout(() => startGate.remove(), 800);
+    musicToggle.classList.add('visible');
+    playMusic();
+    stage.classList.add('playing');
+
+    if (prefersReducedMotion){
+      steps.forEach(s => s.classList.add('active'));
+    } else {
+      setInterval(() => {
+        steps[current].classList.remove('active');
+        current = (current + 1) % steps.length;
+        steps[current].classList.add('active');
+      }, holdMs);
+    }
   }
+
+  startGate.addEventListener('click', startExperience);
+  startGate.addEventListener('touchstart', startExperience, { passive: true });
+  document.addEventListener('keydown', startExperience, { once: true });
 
   // ambient fireflies canvas
   const canvas = document.getElementById('ambient');
