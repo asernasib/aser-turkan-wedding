@@ -343,6 +343,32 @@
     margin:0;
   }
 
+  /* ---------- music toggle ---------- */
+  .music-toggle{
+    position:fixed;
+    top:clamp(0.9rem, 3vh, 1.4rem);
+    right:clamp(0.9rem, 3vw, 1.4rem);
+    z-index:20;
+    width:2.4rem;
+    height:2.4rem;
+    border-radius:50%;
+    border:1px solid var(--hair);
+    background:rgba(28,20,40,0.55);
+    backdrop-filter:blur(4px);
+    color:var(--gold-bright);
+    font-size:1.05rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform 0.3s ease, border-color 0.3s ease;
+  }
+  .music-toggle:hover, .music-toggle:focus-visible{
+    transform:scale(1.08);
+    border-color:var(--gold);
+    outline:none;
+  }
+
   @media (prefers-reduced-motion: reduce){
     .envelope-flap{ animation:none; transform:rotateX(178deg); }
     .seal{ animation:none; opacity:0; transform:scale(0); }
@@ -354,6 +380,16 @@
 </style>
 
 <canvas id="ambient"></canvas>
+
+<iframe
+  id="bgMusic"
+  title="Fon musiqisi"
+  style="position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none;"
+  src="https://www.youtube-nocookie.com/embed/2Vv-BfVoq4g?autoplay=1&mute=1&loop=1&playlist=2Vv-BfVoq4g&controls=0&enablejsapi=1&playsinline=1"
+  allow="autoplay; encrypted-media"
+></iframe>
+
+<button id="musicToggle" class="music-toggle" type="button" aria-label="Musiqini aç">🔇</button>
 
 <div class="stage">
   <svg class="stage-vines" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -424,6 +460,43 @@
 </div>
 
 <script>
+  // background music: autoplays muted on load (browsers block audible
+  // autoplay without a user gesture), unmutes on the first tap/click
+  const bgMusic = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  let musicOn = false;
+
+  function ytCommand(func, args = []){
+    bgMusic.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
+  }
+
+  function playMusic(){
+    ytCommand('unMute');
+    ytCommand('playVideo');
+    musicOn = true;
+    musicToggle.textContent = '🔊';
+    musicToggle.setAttribute('aria-label', 'Musiqini bağla');
+  }
+
+  function pauseMusic(){
+    ytCommand('mute');
+    musicOn = false;
+    musicToggle.textContent = '🔇';
+    musicToggle.setAttribute('aria-label', 'Musiqini aç');
+  }
+
+  ['click', 'touchstart', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, function firstInteract(){
+      playMusic();
+      ['click', 'touchstart', 'keydown'].forEach(e => document.removeEventListener(e, firstInteract));
+    }, { once: true });
+  });
+
+  musicToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    musicOn ? pauseMusic() : playMusic();
+  });
+
   // personalized greeting from ?dear= query param
   const dearName = new URLSearchParams(window.location.search).get('dear');
   if (dearName && dearName.trim()){
