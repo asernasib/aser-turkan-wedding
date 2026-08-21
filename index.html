@@ -266,6 +266,19 @@
     color:var(--rose);
   }
 
+  .dear-greeting{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:clamp(1.3rem, 3.8vw, 1.85rem);
+    color:var(--gold-bright);
+    text-align:center;
+    margin:0 0 1.4rem;
+  }
+  .dear-greeting[hidden]{
+    display:none;
+  }
+
   /* ---------- details plate ---------- */
   .details{
     width:100%;
@@ -407,6 +420,7 @@
     </div>
 
     <div class="invite-text reveal">
+      <p id="dearGreeting" class="dear-greeting" hidden></p>
       <p>Həyatımızın ən gözəl günündə sizi də yanımızda görmək istəyirik. <span class="accent">❤️</span></p>
       <p>Toyumuza dəvətlisiniz! Bu xoşbəxt günümüzü sizinlə birlikdə qeyd etməkdən böyük məmnuniyyət duyarıq. <span class="accent">🥰💍</span></p>
     </div>
@@ -451,6 +465,14 @@
 </main>
 
 <script>
+  // personalized greeting from ?dear= query param
+  const dearName = new URLSearchParams(window.location.search).get('dear');
+  if (dearName && dearName.trim()){
+    const greeting = document.getElementById('dearGreeting');
+    greeting.textContent = `Əzizim ${dearName.trim()},`;
+    greeting.hidden = false;
+  }
+
   // scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
   const io = new IntersectionObserver((entries) => {
