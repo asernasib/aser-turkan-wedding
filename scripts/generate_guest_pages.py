@@ -115,7 +115,9 @@ PAGE_TEMPLATE = """<!doctype html>
 
 def build_page(name: str, slug: str, og_image_url: str) -> str:
     name_html = html.escape(name)
-    page_url = f"{SITE_URL}/i/{slug}.html"
+    # GitHub Pages serves i/<slug>.html at the extensionless i/<slug> too —
+    # use that as the canonical/shareable URL
+    page_url = f"{SITE_URL}/i/{slug}"
     redirect_url = f"/?dear={urllib.parse.quote(name)}"
     return PAGE_TEMPLATE.format(
         name_html=name_html,
