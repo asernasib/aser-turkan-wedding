@@ -120,20 +120,25 @@
   .envelope-body{
     position:absolute;
     inset:0;
-    background:linear-gradient(160deg, #372a4f, #241a34);
-    border:1px solid var(--hair);
-    border-radius:6px;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+    background:
+      radial-gradient(120% 90% at 30% 0%, rgba(154,116,196,0.22), transparent 60%),
+      linear-gradient(165deg, #4a3564 0%, #372a4f 45%, #1e1630 100%);
+    border:1px solid rgba(211,164,87,0.4);
+    border-radius:8px;
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      inset 0 0 40px rgba(0,0,0,0.25);
   }
 
   .envelope-flap{
     position:absolute;
     top:0; left:0; right:0;
     height:56%;
-    background:linear-gradient(200deg, #4a3564, #2e2144);
+    background:linear-gradient(200deg, #5a4278 0%, #4a3564 40%, #2a1f3f 100%);
     clip-path:polygon(0 0, 100% 0, 50% 100%);
     transform-origin:top center;
-    border-radius:6px 6px 0 0;
+    border-radius:8px 8px 0 0;
     z-index:3;
     backface-visibility:hidden;
     -webkit-backface-visibility:hidden;
@@ -147,19 +152,25 @@
     position:absolute;
     top:38%;
     left:50%;
-    width:15%;
+    width:16%;
     aspect-ratio:1;
-    margin:-7.5% 0 0 -7.5%;
+    margin:-8% 0 0 -8%;
     border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #a97c34 100%);
+    background:radial-gradient(circle at 35% 28%, var(--gold-bright), var(--gold) 55%, #8a6428 100%);
     display:flex;
     align-items:center;
     justify-content:center;
-    box-shadow:0 6px 14px rgba(0,0,0,0.45);
+    box-shadow:
+      0 6px 14px rgba(0,0,0,0.5),
+      inset 0 2px 3px rgba(255,255,255,0.4),
+      inset 0 -3px 5px rgba(0,0,0,0.35),
+      0 0 0 3px rgba(28,20,40,0.9),
+      0 0 0 4px rgba(211,164,87,0.55);
     z-index:5;
     font-family:'Cormorant Garamond', serif;
     font-weight:600;
     font-size:clamp(0.8rem, 3.4vh, 1.2rem);
+    letter-spacing:0.12em;
     color:#3a2410;
     animation:sealBreak 1s 1.9s ease-in forwards;
     animation-play-state:paused;
