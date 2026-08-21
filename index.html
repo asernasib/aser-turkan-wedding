@@ -185,7 +185,7 @@
     left:50%;
     top:50%;
     width:88%;
-    transform:translate(-50%, 60%);
+    transform:translate(-50%, -50%);
     background:linear-gradient(180deg, #f8efe0, var(--parchment));
     color:var(--twilight-deep);
     border-radius:4px;
@@ -194,13 +194,13 @@
     box-shadow:0 20px 45px -15px rgba(0,0,0,0.55);
     z-index:4;
     opacity:0;
-    animation:letterRise 1.8s 2.4s cubic-bezier(.2,.7,.3,1) forwards;
+    animation:letterFadeIn 1.8s 2.4s ease-in forwards;
     animation-play-state:paused;
   }
   .stage.playing .letter-card{ animation-play-state:running; }
-  @keyframes letterRise{
-    0%{ opacity:0; transform:translate(-50%, 90%); }
-    100%{ opacity:1; transform:translate(-50%, -50%); }
+  @keyframes letterFadeIn{
+    0%{ opacity:0; }
+    100%{ opacity:1; }
   }
 
   .letter-eyebrow{
