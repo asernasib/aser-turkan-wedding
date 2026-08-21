@@ -383,6 +383,40 @@
     outline:none;
   }
 
+  /* ---------- slide navigation ---------- */
+  .nav-btn{
+    position:fixed;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:15;
+    width:2.6rem;
+    height:2.6rem;
+    border-radius:50%;
+    border:1px solid var(--hair);
+    background:rgba(28,20,40,0.5);
+    backdrop-filter:blur(4px);
+    color:var(--gold-bright);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:transform 0.3s ease, border-color 0.3s ease, opacity 0.6s ease;
+  }
+  .nav-btn svg{ width:1.1rem; height:1.1rem; }
+  .nav-btn.visible{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .nav-btn:hover, .nav-btn:focus-visible{
+    transform:translateY(-50%) scale(1.1);
+    border-color:var(--gold);
+    outline:none;
+  }
+  .nav-prev{ left:clamp(0.7rem, 3vw, 1.4rem); }
+  .nav-next{ right:clamp(0.7rem, 3vw, 1.4rem); }
+
   /* ---------- tap-to-start gate ---------- */
   .start-gate{
     position:fixed;
@@ -495,6 +529,13 @@
 ></iframe>
 
 <button id="musicToggle" class="music-toggle" type="button" aria-label="Musiqini aç">🔇</button>
+
+<button id="prevStep" class="nav-btn nav-prev" type="button" aria-label="Əvvəlki">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+</button>
+<button id="nextStep" class="nav-btn nav-next" type="button" aria-label="Növbəti">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+</button>
 
 <div id="startGate" class="start-gate" role="button" tabindex="0">
   <div class="start-gate-ring">
@@ -623,13 +664,32 @@
   }
 
   // single-screen step player: cross-fades through each step in place,
-  // looping continuously
+  // looping continuously, with prev/next buttons for manual control
   const stage = document.querySelector('.stage');
   const steps = Array.from(document.querySelectorAll('.step'));
   const holdMs = 6200;
   let current = 0;
+  let autoAdvanceTimer = null;
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function goToStep(index){
+    steps[current].classList.remove('active');
+    current = (index + steps.length) % steps.length;
+    steps[current].classList.add('active');
+  }
+
+  function startAutoAdvance(){
+    if (prefersReducedMotion) return;
+    clearInterval(autoAdvanceTimer);
+    autoAdvanceTimer = setInterval(() => goToStep(current + 1), holdMs);
+  }
+
+  const prevBtn = document.getElementById('prevStep');
+  const nextBtn = document.getElementById('nextStep');
+
+  prevBtn.addEventListener('click', () => { goToStep(current - 1); startAutoAdvance(); });
+  nextBtn.addEventListener('click', () => { goToStep(current + 1); startAutoAdvance(); });
 
   // everything - sound and the envelope/step animations - stays frozen
   // until the guest taps or presses a key on the start gate
@@ -643,18 +703,11 @@
     startGate.classList.add('hidden');
     setTimeout(() => startGate.remove(), 800);
     musicToggle.classList.add('visible');
+    prevBtn.classList.add('visible');
+    nextBtn.classList.add('visible');
     playMusic();
     stage.classList.add('playing');
-
-    if (prefersReducedMotion){
-      steps.forEach(s => s.classList.add('active'));
-    } else {
-      setInterval(() => {
-        steps[current].classList.remove('active');
-        current = (current + 1) % steps.length;
-        steps[current].classList.add('active');
-      }, holdMs);
-    }
+    startAutoAdvance();
   }
 
   const startGateCta = document.getElementById('startGateCta');
