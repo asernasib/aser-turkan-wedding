@@ -195,14 +195,20 @@
     padding:0 0.25em;
   }
 
-  /* ---------- progress rail: persistent across all steps ---------- */
-  .progress-rail{
-    position:absolute;
+  /* ---------- bottom bar: prev / progress rail / next ---------- */
+  .bottom-bar{
+    position:fixed;
     bottom:clamp(1.2rem, 4vh, 2.2rem);
     left:50%;
     transform:translateX(-50%);
-    z-index:3;
-    width:min(140px, 40vw);
+    z-index:15;
+    display:flex;
+    align-items:center;
+    gap:clamp(0.7rem, 3vw, 1.4rem);
+  }
+
+  .progress-rail{
+    width:min(120px, 32vw);
     height:2px;
     background:rgba(243,231,216,0.15);
     border-radius:2px;
@@ -385,12 +391,9 @@
 
   /* ---------- slide navigation ---------- */
   .nav-btn{
-    position:fixed;
-    top:50%;
-    transform:translateY(-50%);
-    z-index:15;
-    width:2.6rem;
-    height:2.6rem;
+    width:2rem;
+    height:2rem;
+    flex-shrink:0;
     border-radius:50%;
     border:1px solid var(--hair);
     background:rgba(28,20,40,0.5);
@@ -404,18 +407,16 @@
     pointer-events:none;
     transition:transform 0.3s ease, border-color 0.3s ease, opacity 0.6s ease;
   }
-  .nav-btn svg{ width:1.1rem; height:1.1rem; }
+  .nav-btn svg{ width:0.9rem; height:0.9rem; }
   .nav-btn.visible{
     opacity:1;
     pointer-events:auto;
   }
   .nav-btn:hover, .nav-btn:focus-visible{
-    transform:translateY(-50%) scale(1.1);
+    transform:scale(1.1);
     border-color:var(--gold);
     outline:none;
   }
-  .nav-prev{ left:clamp(0.7rem, 3vw, 1.4rem); }
-  .nav-next{ right:clamp(0.7rem, 3vw, 1.4rem); }
 
   /* ---------- tap-to-start gate ---------- */
   .start-gate{
@@ -530,12 +531,15 @@
 
 <button id="musicToggle" class="music-toggle" type="button" aria-label="Musiqini aç">🔇</button>
 
-<button id="prevStep" class="nav-btn nav-prev" type="button" aria-label="Əvvəlki">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-</button>
-<button id="nextStep" class="nav-btn nav-next" type="button" aria-label="Növbəti">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-</button>
+<div class="bottom-bar">
+  <button id="prevStep" class="nav-btn" type="button" aria-label="Əvvəlki">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <div class="progress-rail"></div>
+  <button id="nextStep" class="nav-btn" type="button" aria-label="Növbəti">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+</div>
 
 <div id="startGate" class="start-gate" role="button" tabindex="0">
   <div class="start-gate-ring">
@@ -612,8 +616,6 @@
     <p class="closing-names">Asər &amp; Türkan</p>
     <p class="closing-note">Sizi gözləyirik</p>
   </div>
-
-  <div class="progress-rail"></div>
 </div>
 
 <script>
