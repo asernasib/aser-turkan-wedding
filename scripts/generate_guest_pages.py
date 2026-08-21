@@ -10,20 +10,34 @@ location.replace() only, deliberately NOT a <meta http-equiv="refresh"> (many
 crawlers, including Facebook's, follow an instant 0-second meta-refresh like a
 real redirect and read the *target* page's tags instead of this page's own).
 
+Also renders a personalized 1200x630 og:image per guest (via ImageMagick),
+reusing the same background/couple-illustration style as the site's generic
+og-image.jpg but with the guest's own name as the headline, instead of every
+guest page sharing that one generic banner.
+
 Run manually after editing the guest list in index.html:
     python3 scripts/generate_guest_pages.py
+
+Requires ImageMagick (`magick`) and the Noto Serif / Montserrat fonts used
+elsewhere in this repo's og-image generation to be installed locally.
 """
 import re
 import pathlib
 import html
+import subprocess
 import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 INDEX = ROOT / "index.html"
 OUT_DIR = ROOT / "i"
+OG_IMAGE_DIR = OUT_DIR / "og"
+COUPLE_ASSET = ROOT / "assets" / "couple-illustration.png"
 
 SITE_URL = "https://aser-turkan.love"
-OG_IMAGE = f"{SITE_URL}/og-image.jpg"
+
+SERIF_FONT = "/usr/share/fonts/google-noto-vf/NotoSerif[wght].ttf"
+SANS_FONT = "/usr/share/fonts/julietaula-montserrat-fonts/Montserrat-Regular.otf"
+SANS_SB_FONT = "/usr/share/fonts/julietaula-montserrat-fonts/Montserrat-SemiBold.otf"
 
 # must mirror GUEST_SLUG_OVERRIDES / GUEST_SLUG_MAP in index.html's <script>
 SLUG_OVERRIDES = {"თიკა": "tika"}
@@ -99,22 +113,52 @@ PAGE_TEMPLATE = """<!doctype html>
 """
 
 
-def build_page(name: str, slug: str) -> str:
+def build_page(name: str, slug: str, og_image_url: str) -> str:
     name_html = html.escape(name)
     page_url = f"{SITE_URL}/i/{slug}.html"
     redirect_url = f"/?dear={urllib.parse.quote(name)}"
     return PAGE_TEMPLATE.format(
         name_html=name_html,
         page_url=page_url,
-        og_image=OG_IMAGE,
+        og_image=og_image_url,
         redirect_url=redirect_url,
         redirect_url_js=repr(redirect_url).replace("'", '"'),
     )
 
 
+def render_guest_image(name: str, out_path: pathlib.Path):
+    """Render a personalized 1200x630 og:image, matching og-image.jpg's
+    background/couple-illustration style but with the guest's own name."""
+    couple = out_path.parent / f".couple-{out_path.stem}.png"
+    subprocess.run(
+        ["magick", str(COUPLE_ASSET), "-resize", "x480", str(couple)],
+        check=True,
+    )
+    try:
+        subprocess.run(
+            [
+                "magick", "-size", "1200x630", "radial-gradient:#4a3564-#1c1428",
+                str(couple), "-gravity", "East", "-geometry", "+70+60", "-compose", "over", "-composite",
+                "-font", SANS_SB_FONT, "-pointsize", "28", "-fill", "#d3a457",
+                "-gravity", "NorthWest", "-annotate", "+72+90", "DƏVƏTLİ",
+                "-font", SERIF_FONT, "-pointsize", "100", "-fill", "#f2d38f",
+                "-gravity", "NorthWest", "-annotate", "+68+140", name,
+                "-font", SANS_FONT, "-pointsize", "30", "-fill", "#f3e7d8",
+                "-gravity", "NorthWest", "-annotate", "+72+300", "Asər & Türkan-ın toy dəvətnaməsi",
+                "-font", SANS_FONT, "-pointsize", "24", "-fill", "#d3a457",
+                "-gravity", "NorthWest", "-annotate", "+72+345", "aser-turkan.love",
+                "-strip", "-quality", "85", str(out_path),
+            ],
+            check=True,
+        )
+    finally:
+        couple.unlink(missing_ok=True)
+
+
 def main():
     names = extract_names()
     OUT_DIR.mkdir(exist_ok=True)
+    OG_IMAGE_DIR.mkdir(exist_ok=True)
 
     seen = {}
     for name in names:
@@ -129,9 +173,12 @@ def main():
         # Georgian "თიკა") share one generated page, using the first
         # name in the guest list as the canonical display form
         canonical = group[0]
-        (OUT_DIR / f"{slug}.html").write_text(build_page(canonical, slug), encoding="utf-8")
+        image_path = OG_IMAGE_DIR / f"{slug}.jpg"
+        render_guest_image(canonical, image_path)
+        og_image_url = f"{SITE_URL}/i/og/{slug}.jpg"
+        (OUT_DIR / f"{slug}.html").write_text(build_page(canonical, slug, og_image_url), encoding="utf-8")
         note = f" (also matches: {', '.join(group[1:])})" if len(group) > 1 else ""
-        print(f"wrote i/{slug}.html for '{canonical}'{note}")
+        print(f"wrote i/{slug}.html + i/og/{slug}.jpg for '{canonical}'{note}")
 
     print(f"\n{len(seen)} pages generated for {len(names)} guest name(s)")
 
