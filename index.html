@@ -63,12 +63,12 @@
     align-items:center;
   }
 
-  .reveal{
+  .auto-reveal{
     opacity:0;
     transform:translateY(28px);
-    transition:opacity 1s ease, transform 1s ease;
+    transition:opacity 1.1s ease, transform 1.1s ease;
   }
-  .reveal.in{
+  .auto-reveal.in{
     opacity:1;
     transform:translateY(0);
   }
@@ -196,37 +196,33 @@
     padding:0 0.25em;
   }
 
-  .scroll-cue{
+  .progress-rail{
     position:absolute;
-    bottom:2.4rem;
+    bottom:2.2rem;
     left:50%;
     transform:translateX(-50%);
     z-index:2;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:0.5rem;
+    width:120px;
+    height:2px;
+    background:rgba(243,231,216,0.15);
+    border-radius:2px;
+    overflow:hidden;
     opacity:0;
-    animation:cueIn 1s 3s ease forwards;
+    animation:cueIn 0.8s 3s ease forwards;
   }
-  @keyframes cueIn{ to{ opacity:0.75; } }
+  @keyframes cueIn{ to{ opacity:1; } }
 
-  .scroll-cue span{
-    font-size:0.62rem;
-    letter-spacing:0.3em;
-    text-transform:uppercase;
-    color:var(--parchment-dim);
+  .progress-rail::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(90deg, var(--gold), var(--gold-bright));
+    transform-origin:left center;
+    transform:scaleX(0);
+    animation:playThrough 10.5s 3.1s linear forwards;
   }
-
-  .scroll-cue .line{
-    width:1px;
-    height:34px;
-    background:linear-gradient(var(--gold), transparent);
-    animation:cueMove 1.8s ease-in-out infinite;
-  }
-  @keyframes cueMove{
-    0%,100%{ transform:scaleY(1); opacity:0.5; }
-    50%{ transform:scaleY(0.5); opacity:1; }
+  @keyframes playThrough{
+    to{ transform:scaleX(1); }
   }
 
   /* ---------- divider ---------- */
@@ -380,7 +376,8 @@
     .envelope-flap{ transform:rotateX(178deg); }
     .seal{ opacity:0; transform:scale(0); }
     .letter-card{ opacity:1; transform:translate(-50%, -46%); }
-    .reveal{ opacity:1; transform:none; }
+    .auto-reveal{ opacity:1; transform:none; }
+    .progress-rail{ opacity:0; }
   }
 </style>
 
@@ -406,20 +403,17 @@
       <div class="seal">A&nbsp;T</div>
     </div>
 
-    <div class="scroll-cue">
-      <span>Aşağı sürüşdürün</span>
-      <div class="line"></div>
-    </div>
+    <div class="progress-rail"></div>
   </section>
 
   <section>
-    <div class="reveal">
+    <div class="auto-reveal" data-step="1">
       <div class="divider">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 21s-7-4.5-9.5-9C.5 8 2 3.5 6 3.5c2.3 0 3.7 1.4 6 4 2.3-2.6 3.7-4 6-4 4 0 5.5 4.5 3.5 8.5-2.5 4.5-9.5 9-9.5 9z"/></svg>
       </div>
     </div>
 
-    <div class="invite-text reveal">
+    <div class="invite-text auto-reveal" data-step="1">
       <p id="dearGreeting" class="dear-greeting" hidden></p>
       <p>Həyatımızın ən gözəl günündə sizi də yanımızda görmək istəyirik. <span class="accent">❤️</span></p>
       <p>Toyumuza dəvətlisiniz! Bu xoşbəxt günümüzü sizinlə birlikdə qeyd etməkdən böyük məmnuniyyət duyarıq. <span class="accent">🥰💍</span></p>
@@ -427,7 +421,7 @@
   </section>
 
   <section class="details">
-    <div class="plate reveal">
+    <div class="plate auto-reveal" data-step="2">
       <p class="plate-title">Toy günü</p>
       <div class="detail-grid">
 
@@ -455,7 +449,7 @@
   </section>
 
   <section class="closing">
-    <div class="reveal">
+    <div class="auto-reveal" data-step="3">
       <div class="closing-heart">❤</div>
       <p class="closing-names">Asər &amp; Türkan</p>
       <p class="closing-note">Sizi gözləyirik</p>
@@ -473,17 +467,26 @@
     greeting.hidden = false;
   }
 
-  // scroll reveal
-  const revealEls = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting){
-        e.target.classList.add('in');
-        io.unobserve(e.target);
-      }
+  // fully automatic playback: reveal + scroll through every section on a timer,
+  // no scrolling or interaction required to trigger any animation
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion){
+    document.querySelectorAll('.auto-reveal').forEach(el => el.classList.add('in'));
+  } else {
+    const timeline = [
+      { step: '1', delay: 3300 },
+      { step: '2', delay: 7600 },
+      { step: '3', delay: 11800 }
+    ];
+    timeline.forEach(({ step, delay }) => {
+      setTimeout(() => {
+        const els = document.querySelectorAll(`.auto-reveal[data-step="${step}"]`);
+        els.forEach(el => el.classList.add('in'));
+        if (els[0]) els[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, delay);
     });
-  }, { threshold: 0.2 });
-  revealEls.forEach(el => io.observe(el));
+  }
 
   // ambient fireflies canvas
   const canvas = document.getElementById('ambient');
