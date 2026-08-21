@@ -240,10 +240,11 @@
     background:linear-gradient(90deg, var(--gold), var(--gold-bright));
     transform-origin:left center;
     transform:scaleX(0);
-    animation:playThrough 24.8s linear infinite;
-    animation-play-state:paused;
+    animation:none;
   }
-  .stage.playing .progress-rail::after{ animation-play-state:running; }
+  /* duration must match holdMs in JS — restarted on every step change so it
+     always fills across the currently-shown step, not the whole loop */
+  .progress-rail.rail-playing::after{ animation:playThrough 6.2s linear; }
   @keyframes playThrough{ to{ transform:scaleX(1); } }
 
   /* ---------- divider ---------- */
@@ -530,7 +531,7 @@
     .seal{ animation:none; opacity:0; transform:scale(0); }
     .letter-card{ animation:none; opacity:1; transform:translate(-50%, -46%); }
     .closing-heart{ animation:none; }
-    .progress-rail::after{ animation:none; transform:scaleX(1); }
+    .progress-rail.rail-playing::after{ animation:none; transform:scaleX(1); }
     .step{ transition:opacity 0.4s ease; transform:none !important; }
     .start-gate-ring::before{ animation:none; opacity:0; }
     .start-gate-cta{ animation:none; }
@@ -702,10 +703,19 @@
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const progressRail = document.querySelector('.progress-rail');
+
+  function restartProgressRail(){
+    progressRail.classList.remove('rail-playing');
+    void progressRail.offsetWidth;
+    progressRail.classList.add('rail-playing');
+  }
+
   function goToStep(index){
     steps[current].classList.remove('active');
     current = (index + steps.length) % steps.length;
     steps[current].classList.add('active');
+    restartProgressRail();
   }
 
   function startAutoAdvance(){
@@ -736,6 +746,7 @@
     nextBtn.classList.add('visible');
     playMusic();
     stage.classList.add('playing');
+    progressRail.classList.add('rail-playing');
     startAutoAdvance();
   }
 
