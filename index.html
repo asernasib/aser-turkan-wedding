@@ -170,9 +170,9 @@
   .letter-card{
     position:absolute;
     left:50%;
-    bottom:6%;
+    top:50%;
     width:88%;
-    transform:translate(-50%, 10%);
+    transform:translate(-50%, 60%);
     background:linear-gradient(180deg, #f8efe0, var(--parchment));
     color:var(--twilight-deep);
     border-radius:4px;
@@ -186,8 +186,8 @@
   }
   .stage.playing .letter-card{ animation-play-state:running; }
   @keyframes letterRise{
-    0%{ opacity:0; transform:translate(-50%, 30%); }
-    100%{ opacity:1; transform:translate(-50%, -46%); }
+    0%{ opacity:0; transform:translate(-50%, 90%); }
+    100%{ opacity:1; transform:translate(-50%, -50%); }
   }
 
   .letter-eyebrow{
@@ -529,7 +529,7 @@
   @media (prefers-reduced-motion: reduce){
     .envelope-flap{ animation:none; transform:rotateX(178deg); }
     .seal{ animation:none; opacity:0; transform:scale(0); }
-    .letter-card{ animation:none; opacity:1; transform:translate(-50%, -46%); }
+    .letter-card{ animation:none; opacity:1; transform:translate(-50%, -50%); }
     .closing-heart{ animation:none; }
     .progress-rail.rail-playing::after{ animation:none; transform:scaleX(1); }
     .step{ transition:opacity 0.4s ease; transform:none !important; }
