@@ -386,12 +386,26 @@
     margin:0 0 clamp(0.8rem, 2.4vh, 1.4rem);
   }
   .summary-guest{
+    margin:-0.6rem 0 clamp(0.8rem, 2.4vh, 1.4rem);
+    text-align:center;
+  }
+  .summary-guest-label{
+    display:block;
+    font-size:0.58rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--parchment-dim);
+    margin-bottom:0.2rem;
+  }
+  .summary-guest-name{
     font-family:'Cormorant Garamond', serif;
     font-style:italic;
-    font-size:clamp(0.85rem, 2.4vh, 1.1rem);
-    color:var(--parchment-dim);
-    margin:-0.6rem 0 clamp(0.8rem, 2.4vh, 1.4rem);
+    font-weight:600;
+    font-size:clamp(1.1rem, 3.2vh, 1.6rem);
+    color:var(--gold-bright);
   }
+  .summary-guest-name::before{ content:"— "; }
+  .summary-guest-name::after{ content:" —"; }
   .closing-note{
     font-size:0.78rem;
     letter-spacing:0.06em;
@@ -662,7 +676,10 @@
   <div class="step" data-step="4">
     <div class="plate">
       <p class="closing-names summary-names"><span data-i18n="groomName">Asər</span> &amp; <span data-i18n="brideName">Türkan</span></p>
-      <p id="summaryGuest" class="summary-guest" hidden></p>
+      <p id="summaryGuest" class="summary-guest" hidden>
+        <span id="summaryGuestLabel" class="summary-guest-label"></span>
+        <span id="summaryGuestName" class="summary-guest-name"></span>
+      </p>
       <div class="detail-grid">
 
         <div class="detail-item">
@@ -809,7 +826,8 @@
       greeting.hidden = false;
 
       const summaryGuest = document.getElementById('summaryGuest');
-      summaryGuest.textContent = `${t.guestLabel}: ${dearName}`;
+      document.getElementById('summaryGuestLabel').textContent = t.guestLabel;
+      document.getElementById('summaryGuestName').textContent = dearName;
       summaryGuest.hidden = false;
     }
   }
