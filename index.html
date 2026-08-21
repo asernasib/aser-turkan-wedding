@@ -368,6 +368,30 @@
     color:var(--parchment-dim);
   }
 
+  .share-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.5rem;
+    margin:clamp(1.2rem, 3.5vh, 2rem) auto 0;
+    padding:0.6rem 1.3rem;
+    border:1px solid var(--hair);
+    border-radius:999px;
+    background:rgba(28,20,40,0.4);
+    font-family:inherit;
+    font-size:0.68rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--parchment-dim);
+    cursor:pointer;
+  }
+  .share-btn svg{ width:16px; height:16px; flex:none; }
+  .share-btn:hover, .share-btn:focus-visible{
+    border-color:var(--gold);
+    color:var(--parchment);
+    outline:none;
+  }
+
   /* ---------- closing ---------- */
   .closing-heart{
     font-size:clamp(1.1rem, 3.4vh, 1.5rem);
@@ -706,6 +730,11 @@
         </div>
 
       </div>
+
+      <button id="shareBtn" class="share-btn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-3.9M8.6 13.5l6.8 3.9"/></svg>
+        <span id="shareBtnLabel"></span>
+      </button>
     </div>
   </div>
 </div>
@@ -737,7 +766,10 @@
       dearPrefix: 'Əzizim',
       groomName: 'Asər',
       brideName: 'Türkan',
-      guestLabel: 'Dəvətli'
+      guestLabel: 'Dəvətli',
+      shareText: 'Asər və Türkanın toy dəvətnaməsi',
+      shareLabel: 'Paylaş',
+      shareCopiedLabel: 'Link kopyalandı!'
     },
     ka: {
       pageTitle: 'ასერ & თურქან — ქორწილის მოსაწვევი',
@@ -760,7 +792,10 @@
       dearPrefix: 'ძვირფასო',
       groomName: 'ასერ',
       brideName: 'თურქან',
-      guestLabel: 'მოწვეული'
+      guestLabel: 'მოწვეული',
+      shareText: 'ასერისა და თურქანის ქორწილის მოსაწვევი',
+      shareLabel: 'გაზიარება',
+      shareCopiedLabel: 'ბმული დაკოპირდა!'
     }
   };
   const t = I18N[LANG];
@@ -779,6 +814,28 @@
   document.getElementById('prevStep').setAttribute('aria-label', t.ariaPrev);
   document.getElementById('nextStep').setAttribute('aria-label', t.ariaNext);
   let musicOn = false;
+
+  // share: uses the device's native share sheet (WhatsApp/Instagram/Facebook/etc.
+  // all appear there if installed, each with its own "Story"/"Status" option) —
+  // there's no reliable way to deep-link straight into a specific app's Story
+  // composer from a plain website. Falls back to copying the link.
+  const shareBtn = document.getElementById('shareBtn');
+  const shareBtnLabel = document.getElementById('shareBtnLabel');
+  shareBtnLabel.textContent = t.shareLabel;
+
+  shareBtn.addEventListener('click', async () => {
+    const shareData = { title: t.pageTitle, text: t.shareText, url: window.location.href };
+    if (navigator.share){
+      try { await navigator.share(shareData); } catch (err) { /* user cancelled */ }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      const original = shareBtnLabel.textContent;
+      shareBtnLabel.textContent = t.shareCopiedLabel;
+      setTimeout(() => { shareBtnLabel.textContent = original; }, 2200);
+    } catch (err) { /* clipboard unavailable — nothing more we can do */ }
+  });
 
   function ytCommand(func, args = []){
     bgMusic.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
