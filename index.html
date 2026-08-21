@@ -72,6 +72,9 @@
     height:100svh;
     overflow:hidden;
     z-index:1;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
     background:
       radial-gradient(ellipse at 50% 18%, rgba(242,211,143,0.14), transparent 55%),
       linear-gradient(180deg, #241a34 0%, #1c1428 55%, #150e20 100%);
@@ -258,6 +261,7 @@
   /* duration must match holdMs in JS — restarted on every step change so it
      always fills across the currently-shown step, not the whole loop */
   .progress-rail.rail-playing::after{ animation:playThrough 6.2s linear forwards; }
+  .progress-rail.paused::after{ animation-play-state:paused; }
   @keyframes playThrough{ to{ transform:scaleX(1); } }
 
   /* ---------- divider ---------- */
@@ -839,6 +843,8 @@
   const holdMs = 6200;
   let current = 0;
   let autoAdvanceTimer = null;
+  let stepDeadline = 0;
+  let pauseRemaining = null; // ms left on the current step's timer while paused, else null
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -857,16 +863,46 @@
     restartProgressRail();
   }
 
+  function scheduleAdvance(ms){
+    clearTimeout(autoAdvanceTimer);
+    stepDeadline = Date.now() + ms;
+    autoAdvanceTimer = setTimeout(() => {
+      if (current === steps.length - 1) return;
+      goToStep(current + 1);
+      startAutoAdvance();
+    }, ms);
+  }
+
   function startAutoAdvance(){
     if (prefersReducedMotion) return;
-    clearInterval(autoAdvanceTimer);
+    clearTimeout(autoAdvanceTimer);
     // the last step is a resting summary screen — don't loop back to the start
     if (current === steps.length - 1) return;
-    autoAdvanceTimer = setInterval(() => {
-      if (current === steps.length - 1){ clearInterval(autoAdvanceTimer); return; }
-      goToStep(current + 1);
-    }, holdMs);
+    scheduleAdvance(holdMs);
   }
+
+  // press-and-hold anywhere on the stage pauses the slideshow and the
+  // progress rail fill; releasing resumes exactly where it left off
+  function pauseSlideshow(){
+    if (!started || pauseRemaining !== null) return;
+    clearTimeout(autoAdvanceTimer);
+    pauseRemaining = Math.max(0, stepDeadline - Date.now());
+    progressRail.classList.add('paused');
+  }
+
+  function resumeSlideshow(){
+    if (pauseRemaining === null) return;
+    progressRail.classList.remove('paused');
+    const remaining = pauseRemaining;
+    pauseRemaining = null;
+    if (prefersReducedMotion || current === steps.length - 1) return;
+    scheduleAdvance(remaining);
+  }
+
+  stage.addEventListener('pointerdown', pauseSlideshow);
+  stage.addEventListener('pointerup', resumeSlideshow);
+  stage.addEventListener('pointercancel', resumeSlideshow);
+  stage.addEventListener('pointerleave', resumeSlideshow);
 
   const prevBtn = document.getElementById('prevStep');
   const nextBtn = document.getElementById('nextStep');
